@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Počítáme do 10, 12 a 20 | Lingua Universal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#32A0D2;--blue-d:#2887B3;--orange:#FFAA37;--orange-d:#E8922A;--ink:#17415A;--sky:#E8F5FB;--line:#CFE8F4;--green:#2FA86B;--red:#E0544B}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Barlow Condensed',Calibri,Arial,sans-serif;background:var(--sky);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--orange);outline-offset:3px}
+header{background:#fff;border-bottom:5px solid var(--orange);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:30px;color:var(--blue);background:none;border:0;padding:0}
+.brand img{height:44px;width:auto;display:block}
+.counters{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{background:var(--sky);border:2px solid var(--line);border-radius:999px;padding:5px 14px;font-size:22px;font-weight:700;color:var(--ink);display:inline-block}
+.pill.bump{animation:bump .35s}
+.pill.clock{font-variant-numeric:tabular-nums;min-width:88px;text-align:center}
+main{flex:1;width:100%;max-width:820px;margin:0 auto;padding:20px 16px 40px}
+.screen{display:none}.screen.active{display:block}
+.bubble{background:#fff;border-radius:22px;padding:12px 20px;font-size:26px;font-weight:600;position:relative;box-shadow:0 3px 0 var(--line);margin:0;min-height:58px;display:flex;align-items:center}
+.bubble::before{content:'';position:absolute;left:-13px;top:50%;margin-top:-10px;border-style:solid;border-width:10px 14px 10px 0;border-color:transparent #fff transparent transparent}
+.hero{display:flex;align-items:center;gap:20px;margin:6px 0 20px}
+.owlBig img{height:120px;width:auto;display:block}
+.classbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-radius:20px;padding:10px 16px;margin-bottom:18px;box-shadow:0 3px 0 var(--line)}
+.classbar .who{font-size:26px;font-weight:700}
+.classbar .who b{color:var(--blue);font-size:30px}
+.mini{border:2px solid var(--line);background:var(--sky);border-radius:999px;font-size:20px;font-weight:700;padding:4px 14px}
+.classbar .mini{margin-left:auto}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.level{border:0;border-radius:28px;color:#fff;padding:16px 8px 12px;display:flex;flex-direction:column;align-items:center;box-shadow:0 6px 0 rgba(0,0,0,.2);transition:transform .08s}
+.level:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.level .num{font-size:100px;line-height:.9;font-weight:800}
+.level .lab{font-size:23px;font-weight:600}
+.level .rec{font-size:20px;font-weight:700;margin-top:8px;background:rgba(255,255,255,.3);border-radius:999px;padding:2px 12px;font-variant-numeric:tabular-nums}
+.level .badge{font-size:19px;font-weight:700;margin-top:5px;visibility:hidden}
+.level .badge.on{visibility:visible}
+.l10{background:var(--blue)}.l12{background:var(--orange);color:var(--ink)}.l20{background:var(--ink)}
+.homeNote{margin:22px auto 0;font-size:23px;text-align:center;max-width:36em}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.back{border:2px solid var(--line);background:#fff;border-radius:999px;font-size:20px;font-weight:700;padding:5px 16px}
+.tag{font-size:24px;font-weight:800;color:var(--blue)}
+.dots{margin-left:auto;display:flex;gap:6px}
+.dot{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--line)}
+.dot.now{border-color:var(--orange);border-width:3px}
+.dot.star{background:var(--orange);border-color:var(--orange)}
+.dot.done{background:var(--blue);border-color:var(--blue)}
+.coach{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+#coachOwl img{height:84px;width:auto;display:block}
+.card{background:#fff;border-radius:28px;padding:20px 16px 22px;box-shadow:0 5px 0 var(--line);text-align:center}
+.question{font-size:36px;font-weight:800;margin:0 0 14px}
+.visual{min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.answers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ans{font-size:54px;font-weight:800;border:0;border-radius:22px;background:var(--sky);padding:6px 0;box-shadow:0 5px 0 #B9DCEC}
+.ans:hover:not(:disabled){background:#D8EEF8}
+.ans.ok{background:var(--green);color:#fff;box-shadow:0 5px 0 #1F7D4E}
+.ans.bad{background:#F6DEDC;color:#B3453E;box-shadow:none;animation:shake .4s}
+.ans:disabled{cursor:default}
+.tens{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.ten{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px;border-radius:16px;background:var(--sky)}
+.obj{width:54px;height:54px;font-size:36px;border:0;background:transparent;border-radius:12px;position:relative;padding:0;line-height:1}
+.obj.mark{background:#FFF1D9}
+.obj .n{position:absolute;right:-5px;top:-7px;background:var(--orange);color:var(--ink);font-size:17px;font-weight:800;border-radius:999px;min-width:23px;height:23px;display:grid;place-items:center;padding:0 5px}
+.reset{border:0;background:none;color:var(--blue);font-size:20px;font-weight:700;text-decoration:underline}
+.line{display:flex;gap:8px;justify-content:center}
+.box{width:clamp(54px,15vw,76px);height:clamp(64px,17vw,84px);border-radius:16px;background:var(--sky);font-size:clamp(38px,10vw,50px);font-weight:800;display:grid;place-items:center}
+.hole{background:#fff;border:4px dashed var(--orange);color:var(--orange)}
+.hole.filled{border-style:solid;background:var(--green);border-color:var(--green);color:#fff}
+.note{font-size:21px;font-weight:600;color:#5B7F93;margin:0}
+.expr{font-size:76px;font-weight:800;line-height:1;display:flex;align-items:center;gap:14px;justify-content:center}
+.expr .hole{width:92px;height:92px;border-radius:18px;font-size:66px;display:grid;place-items:center}
+.pips{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;max-width:560px}
+.pipgroup{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.pip{width:22px;height:22px;border-radius:50%;background:var(--blue);position:relative}
+.pip.o{background:var(--orange)}
+.pip.gap{margin-right:10px}
+.pip.gone{background:var(--line)}
+.pip.gone::after{content:'';position:absolute;left:-3px;right:-3px;top:50%;height:3px;margin-top:-1.5px;background:var(--red);transform:rotate(-45deg)}
+.end{text-align:center}
+.medal{font-size:120px;line-height:1.05}
+.end h2{font-size:48px;margin:4px 0}
+.end p{font-size:26px;margin:0 0 8px}
+.timeBig{font-size:74px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums;line-height:1}
+.timeNote{font-size:22px;color:#5B7F93;margin:2px 0 8px}
+.newrec{display:inline-block;background:var(--orange);color:var(--ink);font-size:26px;font-weight:800;border-radius:999px;padding:4px 18px;margin:8px 0}
+.starsRow{font-size:clamp(22px,7vw,34px);letter-spacing:2px;margin:6px 0 18px;white-space:nowrap}
+.starsRow .off{filter:grayscale(1);opacity:.25}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{border:0;border-radius:999px;background:var(--orange);color:var(--ink);font-size:26px;font-weight:800;padding:10px 26px;box-shadow:0 5px 0 var(--orange-d)}
+.btn.blue{background:var(--blue);color:#fff;box-shadow:0 5px 0 var(--blue-d)}
+.btn.ghost{background:#fff;border:2px solid var(--line);box-shadow:none}
+.btn:active{transform:translateY(3px)}
+.headline{font-size:44px;margin:0;color:var(--blue)}
+.sub{font-size:24px;margin:4px 0 0}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px;margin:18px 0 24px}
+.slot{aspect-ratio:1;border-radius:22px;background:#fff;display:grid;place-items:center;font-size:58px;box-shadow:0 4px 0 var(--line)}
+.slot.empty{background:transparent;border:3px dashed #B9DCEC;box-shadow:none;color:#B9DCEC;font-size:42px;font-weight:800}
+.tabs{display:flex;gap:8px;margin:16px 0 14px;flex-wrap:wrap}
+.tab{border:2px solid var(--line);background:#fff;border-radius:999px;font-size:22px;font-weight:700;padding:5px 18px}
+.tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.board{background:#fff;border-radius:24px;padding:6px 6px;box-shadow:0 4px 0 var(--line)}
+.row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:2px solid var(--sky);font-size:26px}
+.row:last-child{border-bottom:0}
+.row .pos{font-size:30px;font-weight:800;min-width:44px}
+.row .cls{font-weight:800;color:var(--blue);font-size:30px}
+.row .nick{color:#5B7F93;font-weight:600}
+.row .t{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;font-size:30px}
+.row.me{background:#FFF6E6;border-radius:16px}
+.empty-msg{font-size:24px;padding:18px 14px;color:#5B7F93}
+.overlay{position:fixed;inset:0;background:rgba(23,65,90,.55);display:none;place-items:center;z-index:50;padding:20px}
+.overlay.show{display:grid}
+.modal{background:#fff;border-radius:32px;padding:24px 26px 26px;text-align:center;max-width:400px;width:100%;animation:pop .4s}
+.modal h2{font-size:40px;margin:0;color:var(--blue)}
+.modal p{font-size:22px;margin:6px 0 14px;color:#5B7F93}
+.big{font-size:130px;line-height:1.15;margin:6px 0 14px}
+.field{width:100%;border:3px solid var(--line);border-radius:18px;background:var(--sky);font-size:34px;font-weight:800;text-align:center;padding:8px 12px;margin-bottom:12px}
+.field::placeholder{color:#9FC6D9;font-weight:600}
+.quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+.quick button{border:2px solid var(--line);background:#fff;border-radius:999px;font-size:22px;font-weight:700;padding:4px 14px}
+footer{text-align:center;font-size:18px;color:#5B7F93;padding:0 16px 16px}
+.happy{animation:hop .45s 2}
+.sad{animation:tilt .5s}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:60;pointer-events:none;animation:fall linear forwards}
+.fly{position:fixed;font-size:42px;z-index:70;pointer-events:none;transform:translate(-50%,-50%)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes bump{50%{transform:scale(1.25)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+@keyframes tilt{0%,100%{transform:rotate(0)}30%{transform:rotate(-10deg)}70%{transform:rotate(8deg)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (max-width:560px){
+ .level .num{font-size:62px}.level .lab{font-size:18px}.level .rec{font-size:17px;padding:2px 8px}.level .badge{font-size:16px}
+ .owlBig img{height:86px}#coachOwl img{height:62px}
+ .bubble{font-size:21px;padding:10px 14px}
+ .question{font-size:29px}.expr{font-size:56px}.expr .hole{width:72px;height:72px;font-size:50px}
+ .answers{gap:8px}.ans{font-size:42px}
+ .obj{width:46px;height:46px;font-size:30px}
+ .brand span{font-size:25px}.brand img{height:36px}.pill{font-size:19px;padding:4px 10px}
+ .dots{margin-left:0;width:100%;justify-content:center}
+ .row{font-size:22px}.row .cls,.row .t{font-size:25px}
+ .timeBig{font-size:58px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="brand" id="homeBtn" aria-label="Na úvod"><img class="logo" alt=""><span>Počítáme</span></button>
+  <div class="counters">
+    <span class="pill clock" id="clock" style="display:none" aria-hidden="true">0:00</span>
+    <span class="pill" id="starCount" aria-live="polite">⭐ 0</span>
+    <button class="pill" id="stickerBtn">Nálepky 0/16</button>
+    <button class="pill" id="soundBtn" aria-label="Vypnout zvuk">🔊</button>
+  </div>
+</header>
+
+<main>
+  <section class="screen active" id="start">
+    <div class="hero">
+      <div class="owlBig"><img class="logo" alt=""></div>
+      <p class="bubble" id="welcome">Ahoj! Do kolika dnes budeme počítat?</p>
+    </div>
+    <div class="classbar">
+      <span class="who">Hraje třída <b id="whoClass">—</b> <span class="nick" id="whoNick"></span></span>
+      <button class="mini" id="changeClass">Změnit</button>
+    </div>
+    <div class="levels">
+      <button class="level l10" data-max="10"><span class="num">10</span><span class="lab">do deseti</span><span class="rec" id="r10">—</span><span class="badge" id="b10">🏆 Mistr</span></button>
+      <button class="level l12" data-max="12"><span class="num">12</span><span class="lab">do dvanácti</span><span class="rec" id="r12">—</span><span class="badge" id="b12">🏆 Mistr</span></button>
+      <button class="level l20" data-max="20"><span class="num">20</span><span class="lab">do dvaceti</span><span class="rec" id="r20">—</span><span class="badge" id="b20">🏆 Mistr</span></button>
+    </div>
+    <p class="homeNote">Kolo má 10 úloh a měří se čas. Za každou chybu se připočte 5 vteřin.<br>Správná odpověď napoprvé = ⭐, za 5 hvězd je nová nálepka.</p>
+    <div class="actions" style="margin-top:18px"><button class="btn ghost" id="boardBtn">Nejrychlejší třídy</button></div>
+  </section>
+
+  <section class="screen" id="game">
+    <div class="bar">
+      <button class="back" id="quitBtn">Zpět</button>
+      <span class="tag" id="levelTag">do 10</span>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+    </div>
+    <div class="coach">
+      <div id="coachOwl"><img class="logo" alt=""></div>
+      <p class="bubble" id="say" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <h2 class="question" id="question"></h2>
+      <div class="visual" id="visual"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+  </section>
+
+  <section class="screen end" id="end">
+    <div class="medal" id="medal"></div>
+    <h2 id="endTitle"></h2>
+    <div class="timeBig" id="endTime"></div>
+    <p class="timeNote" id="endTimeNote"></p>
+    <div id="recLine"></div>
+    <p id="endText"></p>
+    <div class="starsRow" id="starsRow" aria-hidden="true"></div>
+    <div class="actions">
+      <button class="btn" id="againBtn">Hrát znovu</button>
+      <button class="btn blue" id="nextLevelBtn">Zkusit do 12</button>
+      <button class="btn ghost" id="boardFromEnd">Nejrychlejší třídy</button>
+      <button class="btn ghost" id="chooseBtn">Vybrat jiné číslo</button>
+    </div>
+  </section>
+
+  <section class="screen" id="boardScreen">
+    <h2 class="headline">Nejrychlejší třídy</h2>
+    <p class="sub">Nejlepší čas každé třídy. Čas se počítá i s pěti vteřinami za každou chybu.</p>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-max="10">do 10</button>
+      <button class="tab" data-max="12">do 12</button>
+      <button class="tab" data-max="20">do 20</button>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="actions" style="margin-top:20px">
+      <button class="btn ghost" id="boardBack">Zpět na výběr</button>
+      <button class="btn ghost" id="clearBoard">Smazat rekordy</button>
+    </div>
+  </section>
+
+  <section class="screen" id="albumScreen">
+    <h2 class="headline">Moje nálepky</h2>
+    <p class="sub" id="albumInfo"></p>
+    <div class="album" id="album"></div>
+    <div class="actions"><button class="btn" id="albumBack">Zpět na výběr</button></div>
+  </section>
+</main>
+
+<footer>Lingua Universal, soukromá základní škola a mateřská škola Litoměřice</footer>
+
+<div class="overlay" id="classOverlay" role="dialog" aria-modal="true" aria-labelledby="classTitle">
+  <div class="modal">
+    <h2 id="classTitle">Za kterou třídu hraješ?</h2>
+    <p>Jméno vyplňovat nemusíš.</p>
+    <input class="field" id="classInput" maxlength="6" placeholder="3.A" aria-label="Třída" autocomplete="off">
+    <div class="quick" id="classQuick"></div>
+    <input class="field" id="nickInput" maxlength="14" placeholder="přezdívka (nepovinné)" aria-label="Přezdívka" autocomplete="off" style="font-size:26px">
+    <button class="btn" id="classOk">Jdeme počítat</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="stickerTitle">
+  <div class="modal">
+    <h2 id="stickerTitle">Nová nálepka!</h2>
+    <div class="big" id="newSticker"></div>
+    <button class="btn" id="stickerOk">Nalepit do sbírky</button>
+  </div>
+</div>
+
+<script>
+const LOGO='data:image/png;base64,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';
+document.querySelectorAll('img.logo').forEach(i => i.src = LOGO);
+
+const ROUND = 10, STARS_PER_STICKER = 5, PENALTY = 5, KEY = 'lingua-pocitame-v1';
+const OBJECTS = ['🍎','🐞','⭐','🐟','🍓','🎈','🌼','🍪','🐤','🚗','🍐','🐌'];
+const PRAISE = ['Výborně!','Správně!','Super!','Paráda!','To je ono!','Skvělé!'];
+const RETRY = ['Zkus to znovu.','Ještě jednou, zvládneš to.','Skoro! Zkus jiné číslo.'];
+const HINT = {
+  count: 'Ťukni na každý obrázek a počítej.',
+  line: 'Řekni si čísla po řadě nahlas.',
+  plus: 'Spočítej všechny tečky dohromady.',
+  minus: 'Přeškrtnuté tečky už nepočítej.'
+};
+
+const $ = s => document.querySelector(s);
+const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const pick = a => a[rnd(0, a.length - 1)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = ms => { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+
+const STICKERS = ['🦊','🐸','🐼','🦁','🐙','🦄','🐢','🦋','🐧','🐬','🐝','🐨','🦒','🐳','🦕','🐯'];
+
+const S = { max: 10, results: [], roundStars: 0, totalStars: 0, streak: 0,
+  stickers: [], mastered: {}, task: null, firstTry: true, locked: false, lastKey: '', pending: false,
+  cls: '', nick: '', t0: 0, penalty: 0, timer: null, boardMax: 10 };
+
+/* ---------- ukládání ---------- */
+let DB = { records: {}, classes: [] };
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) DB = Object.assign(DB, JSON.parse(raw)); } catch (e) {}
+  DB.records = DB.records || {}; DB.classes = DB.classes || [];
+  try {
+    S.cls = localStorage.getItem(KEY + '-class') || '';
+    S.nick = localStorage.getItem(KEY + '-nick') || '';
+  } catch (e) {}
+}
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(DB));
+    localStorage.setItem(KEY + '-class', S.cls);
+    localStorage.setItem(KEY + '-nick', S.nick);
+  } catch (e) {}
+}
+function bestOf(cls, max) {
+  const r = (DB.records[max] || []).filter(x => x.cls === cls);
+  return r.length ? Math.min(...r.map(x => x.ms)) : null;
+}
+function boardFor(max) {
+  const byClass = {};
+  (DB.records[max] || []).forEach(r => {
+    if (!byClass[r.cls] || r.ms < byClass[r.cls].ms) byClass[r.cls] = r;
+  });
+  return Object.values(byClass).sort((a, b) => a.ms - b.ms);
+}
+function addRecord(max, ms) {
+  const prevClass = bestOf(S.cls, max);
+  const prevTop = boardFor(max)[0];
+  DB.records[max] = DB.records[max] || [];
+  DB.records[max].push({ cls: S.cls, nick: S.nick, ms, d: Date.now() });
+  DB.records[max] = DB.records[max].sort((a, b) => a.ms - b.ms).slice(0, 60);
+  if (!DB.classes.includes(S.cls)) DB.classes.push(S.cls);
+  save();
+  return {
+    classBest: prevClass === null || ms < prevClass,
+    overall: !prevTop || ms < prevTop.ms
+  };
+}
+
+/* ---------- zvuk ---------- */
+let AC = null, soundOn = true;
+function tone(freqs, dur = 0.12) {
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = AC.currentTime;
+    freqs.forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      const s = t0 + i * dur;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, s);
+      g.gain.exponentialRampToValueAtTime(0.22, s + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, s + dur);
+      o.connect(g).connect(AC.destination);
+      o.start(s); o.stop(s + dur + 0.02);
+    });
+  } catch (e) {}
+}
+
+/* ---------- obrazovky ---------- */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(e => e.classList.toggle('active', e.id === id));
+  window.scrollTo(0, 0);
+}
+function say(msg) { $('#say').textContent = msg; }
+function owl(cls) {
+  const o = $('#coachOwl');
+  o.classList.remove('happy', 'sad'); void o.offsetWidth; o.classList.add(cls);
+}
+function updateCounters(bump) {
+  $('#starCount').textContent = '⭐ ' + S.totalStars;
+  $('#stickerBtn').textContent = 'Nálepky ' + S.stickers.length + '/' + STICKERS.length;
+  if (bump) { const p = $('#starCount'); p.classList.remove('bump'); void p.offsetWidth; p.classList.add('bump'); }
+}
+function renderHome() {
+  $('#whoClass').textContent = S.cls || '—';
+  $('#whoNick').textContent = S.nick ? '· ' + S.nick : '';
+  [10, 12, 20].forEach(m => {
+    $('#b' + m).classList.toggle('on', !!S.mastered[m]);
+    const top = boardFor(m)[0];
+    $('#r' + m).textContent = top ? '⏱ ' + top.cls + ' ' + fmt(top.ms) : '⏱ zatím nikdo';
+  });
+}
+
+/* ---------- třída ---------- */
+function askClass() {
+  $('#classInput').value = S.cls;
+  $('#nickInput').value = S.nick;
+  const q = $('#classQuick');
+  q.innerHTML = '';
+  DB.classes.slice(0, 8).forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = c;
+    b.onclick = () => { $('#classInput').value = c; };
+    q.appendChild(b);
+  });
+  $('#classOverlay').classList.add('show');
+  setTimeout(() => $('#classInput').focus(), 50);
+}
+function saveClass() {
+  const c = $('#classInput').value.trim().toUpperCase().replace(/\s+/g, '');
+  if (!c) { $('#classInput').focus(); return; }
+  S.cls = c;
+  S.nick = $('#nickInput').value.trim();
+  save();
+  $('#classOverlay').classList.remove('show');
+  renderHome();
+}
+
+/* ---------- úlohy ---------- */
+function genTask(max) {
+  const type = pick(['count', 'line', 'plus', 'minus']);
+  if (type === 'count') {
+    const n = rnd(3, max);
+    return { type, n, answer: n, obj: pick(OBJECTS), key: 'c' + n, question: 'Kolik je tu obrázků?' };
+  }
+  if (type === 'line') {
+    const start = rnd(0, max - 4);
+    const seq = [0, 1, 2, 3, 4].map(i => start + i);
+    const down = Math.random() < 0.3;
+    if (down) seq.reverse();
+    const hole = rnd(0, 4);
+    return { type, seq, hole, down, answer: seq[hole], key: 'l' + seq.join() + hole, question: 'Které číslo chybí?' };
+  }
+  if (type === 'plus') {
+    const a = rnd(1, max - 1), b = rnd(1, max - a);
+    return { type, a, b, answer: a + b, key: 'p' + a + '+' + b, question: 'Kolik je to dohromady?' };
+  }
+  const a = rnd(2, max), b = rnd(1, a - 1);
+  return { type: 'minus', a, b, answer: a - b, key: 'm' + a + '-' + b, question: 'Kolik zbude?' };
+}
+function makeTask(max) {
+  let t, g = 0;
+  do { t = genTask(max); g++; } while (t.key === S.lastKey && g < 20);
+  S.lastKey = t.key;
+  return t;
+}
+function makeOptions(ans, max) {
+  const set = new Set([ans]);
+  const cand = [];
+  for (let d = 1; d <= 4; d++) cand.push(ans + d, ans - d);
+  shuffle(cand);
+  for (const c of cand) { if (set.size >= 4) break; if (c >= 0 && c <= max) set.add(c); }
+  return [...set].sort((a, b) => a - b);
+}
+function pipGroup(n, cls, goneFrom) {
+  const g = document.createElement('div');
+  g.className = 'pipgroup';
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('span');
+    p.className = 'pip' + (cls ? ' ' + cls : '') +
+      (goneFrom != null && i >= goneFrom ? ' gone' : '') +
+      ((i + 1) % 5 === 0 && i < n - 1 ? ' gap' : '');
+    g.appendChild(p);
+  }
+  return g;
+}
+
+function renderTask() {
+  const t = S.task, v = $('#visual');
+  $('#question').textContent = t.question;
+  v.innerHTML = '';
+  say(HINT[t.type]);
+
+  if (t.type === 'count') {
+    const tens = document.createElement('div');
+    tens.className = 'tens';
+    let counted = 0, block;
+    for (let i = 0; i < t.n; i++) {
+      if (i % 10 === 0) { block = document.createElement('div'); block.className = 'ten'; tens.appendChild(block); }
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'obj'; b.textContent = t.obj;
+      b.setAttribute('aria-label', 'Obrázek');
+      b.onclick = () => {
+        if (b.classList.contains('mark')) return;
+        counted++;
+        b.classList.add('mark');
+        const n = document.createElement('span'); n.className = 'n'; n.textContent = counted;
+        b.appendChild(n);
+        tone([440 + counted * 22], 0.07);
+      };
+      block.appendChild(b);
+    }
+    v.appendChild(tens);
+    const r = document.createElement('button');
+    r.type = 'button'; r.className = 'reset'; r.textContent = 'Počítat znovu';
+    r.onclick = () => {
+      counted = 0;
+      tens.querySelectorAll('.obj').forEach(o => { o.classList.remove('mark'); const n = o.querySelector('.n'); if (n) n.remove(); });
+    };
+    v.appendChild(r);
+
+  } else if (t.type === 'line') {
+    const line = document.createElement('div');
+    line.className = 'line';
+    t.seq.forEach((n, i) => {
+      const b = document.createElement('div');
+      b.className = 'box' + (i === t.hole ? ' hole' : '');
+      if (i === t.hole) { b.id = 'hole'; b.textContent = '?'; } else b.textContent = n;
+      line.appendChild(b);
+    });
+    v.appendChild(line);
+    if (t.down) { const p = document.createElement('p'); p.className = 'note'; p.textContent = 'Počítáme pozpátku.'; v.appendChild(p); }
+
+  } else {
+    const e = document.createElement('div');
+    e.className = 'expr';
+    e.innerHTML = '<span>' + t.a + '</span><span>' + (t.type === 'plus' ? '+' : '−') + '</span><span>' + t.b + '</span><span>=</span><span class="hole" id="hole">?</span>';
+    v.appendChild(e);
+    const pips = document.createElement('div');
+    pips.className = 'pips'; pips.setAttribute('aria-hidden', 'true');
+    if (t.type === 'plus') { pips.appendChild(pipGroup(t.a, '')); pips.appendChild(pipGroup(t.b, 'o')); }
+    else pips.appendChild(pipGroup(t.a, '', t.a - t.b));
+    v.appendChild(pips);
+  }
+
+  const box = $('#answers');
+  box.innerHTML = '';
+  makeOptions(t.answer, S.max).forEach(n => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ans'; b.textContent = n;
+    b.onclick = () => check(b, n);
+    box.appendChild(b);
+  });
+}
+
+function renderProgress() {
+  const d = $('#dots');
+  d.innerHTML = '';
+  for (let i = 0; i < ROUND; i++) {
+    const s = document.createElement('span');
+    s.className = 'dot' + (S.results[i] ? ' ' + S.results[i] : (i === S.results.length ? ' now' : ''));
+    d.appendChild(s);
+  }
+}
+
+/* ---------- čas ---------- */
+function tickStart() {
+  S.t0 = Date.now(); S.penalty = 0;
+  $('#clock').style.display = '';
+  $('#clock').textContent = '0:00';
+  clearInterval(S.timer);
+  S.timer = setInterval(() => { $('#clock').textContent = fmt(now()); }, 250);
+}
+function now() { return Date.now() - S.t0 + S.penalty * 1000; }
+function tickStop() { clearInterval(S.timer); S.timer = null; $('#clock').style.display = 'none'; }
+
+/* ---------- hra ---------- */
+function startLevel(max) {
+  if (!S.cls) { askClass(); return; }
+  S.max = max; S.results = []; S.roundStars = 0; S.streak = 0;
+  $('#levelTag').textContent = 'do ' + max;
+  show('game');
+  S.task = makeTask(max); S.firstTry = true; S.locked = false;
+  renderTask(); renderProgress(); tickStart();
+}
+
+function check(btn, val) {
+  if (S.locked || btn.disabled) return;
+  const t = S.task;
+  if (val === t.answer) {
+    S.locked = true;
+    btn.classList.add('ok');
+    document.querySelectorAll('.ans').forEach(b => b.disabled = true);
+    const h = $('#hole'); if (h) { h.textContent = t.answer; h.classList.add('filled'); }
+    tone([660, 880]);
+    owl('happy');
+    if (S.firstTry) {
+      S.roundStars++; S.totalStars++; S.streak++;
+      flyStar(btn);
+      if (S.streak === ROUND) say('Všechno napoprvé! Jsi hvězda!');
+      else if (S.streak === 5) say('Pět hvězd za sebou!');
+      else if (S.streak === 3) say('Tři hvězdy za sebou!');
+      else say(pick(PRAISE));
+    } else {
+      say('Správně! Příště to zkus napoprvé.');
+    }
+    S.results.push(S.firstTry ? 'star' : 'done');
+    renderProgress();
+    const last = S.results.length >= ROUND;
+    if (last) { S.finalMs = now(); tickStop(); }
+    const sticker = S.firstTry && S.totalStars % STARS_PER_STICKER === 0 && S.stickers.length < STICKERS.length;
+    if (sticker) { S.pending = true; setTimeout(giveSticker, 900); }
+    else setTimeout(advance, last ? 900 : 1300);
+  } else {
+    btn.classList.add('bad');
+    btn.disabled = true;
+    S.firstTry = false; S.streak = 0;
+    S.penalty += PENALTY;
+    tone([300, 220], 0.14);
+    owl('sad');
+    say(pick(RETRY) + ' ' + HINT[t.type]);
+  }
+}
+
+function advance() {
+  if (S.results.length >= ROUND) { endRound(); return; }
+  S.task = makeTask(S.max); S.firstTry = true; S.locked = false;
+  renderTask(); renderProgress();
+}
+
+function flyStar(from) {
+  const target = $('#starCount');
+  if (reduced || !from.animate) { updateCounters(true); return; }
+  const r = from.getBoundingClientRect(), tr = target.getBoundingClientRect();
+  const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
+  const dx = tr.left + tr.width / 2 - x0, dy = tr.top + tr.height / 2 - y0;
+  const s = document.createElement('div');
+  s.className = 'fly'; s.textContent = '⭐';
+  s.style.left = x0 + 'px'; s.style.top = y0 + 'px';
+  document.body.appendChild(s);
+  s.animate([
+    { transform: 'translate(-50%,-50%) scale(1.3)' },
+    { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(.5)' }
+  ], { duration: 750, easing: 'cubic-bezier(.5,-0.4,.7,1)' }).onfinish = () => { s.remove(); updateCounters(true); };
+}
+
+function giveSticker() {
+  const next = STICKERS.find(x => !S.stickers.includes(x));
+  S.stickers.push(next);
+  updateCounters();
+  $('#newSticker').textContent = next;
+  $('#overlay').classList.add('show');
+  tone([523, 659, 784, 1047], 0.12);
+  confetti();
+  $('#stickerOk').focus();
+}
+
+function starWord(n) { return n === 1 ? 'hvězdu' : (n >= 2 && n <= 4 ? 'hvězdy' : 'hvězd'); }
+
+function endRound() {
+  const n = S.roundStars, ms = S.finalMs, mistakes = S.penalty / PENALTY;
+  const res = addRecord(S.max, ms);
+  const master = n >= 8;
+  if (master) S.mastered[S.max] = true;
+  renderHome();
+
+  $('#medal').textContent = res.overall ? '🚀' : (master ? '🏆' : (n >= 7 ? '🥈' : '🥉'));
+  $('#endTitle').textContent = res.overall ? 'Nejrychlejší čas ze všech tříd!'
+    : (res.classBest ? 'Nový rekord třídy ' + S.cls + '!' : (master ? 'Mistr počítání do ' + S.max + '!' : 'Dobrá práce!'));
+  $('#endTime').textContent = fmt(ms);
+  $('#endTimeNote').textContent = mistakes
+    ? 'Z toho ' + (mistakes * PENALTY) + ' vteřin za chyby.'
+    : 'Bez jediné chyby.';
+  const top = boardFor(S.max)[0];
+  $('#recLine').innerHTML = (res.classBest || res.overall)
+    ? '<span class="newrec">⏱ nový rekord</span>'
+    : (top ? '<p class="timeNote">Nejlepší čas drží ' + top.cls + ' — ' + fmt(top.ms) + '.</p>' : '');
+  $('#endText').textContent = 'Máš ' + n + ' ' + starWord(n) + ' z ' + ROUND + '.';
+  $('#starsRow').innerHTML = Array.from({ length: ROUND }, (_, i) => '<span class="' + (i < n ? '' : 'off') + '">⭐</span>').join('');
+
+  const nextMax = S.max === 10 ? 12 : S.max === 12 ? 20 : null;
+  const nb = $('#nextLevelBtn');
+  nb.style.display = master && nextMax ? '' : 'none';
+  if (nextMax) { nb.textContent = 'Zkusit do ' + nextMax; nb.onclick = () => startLevel(nextMax); }
+
+  show('end');
+  if (res.classBest || n >= 7) { confetti(); tone([523, 659, 784, 1047, 784, 1047], 0.13); }
+  else tone([523, 659, 784], 0.13);
+}
+
+/* ---------- tabulky ---------- */
+function renderBoard(max) {
+  S.boardMax = max;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', +t.dataset.max === max));
+  const rows = boardFor(max);
+  const b = $('#board');
+  if (!rows.length) { b.innerHTML = '<p class="empty-msg">Do ' + max + ' zatím nikdo nehrál. Buďte první.</p>'; show('boardScreen'); return; }
+  const medal = ['🥇', '🥈', '🥉'];
+  b.innerHTML = rows.slice(0, 10).map((r, i) =>
+    '<div class="row' + (r.cls === S.cls ? ' me' : '') + '">' +
+    '<span class="pos">' + (medal[i] || (i + 1) + '.') + '</span>' +
+    '<span class="cls">' + r.cls + '</span>' +
+    (r.nick ? '<span class="nick">' + r.nick + '</span>' : '') +
+    '<span class="t">' + fmt(r.ms) + '</span></div>').join('');
+  show('boardScreen');
+}
+
+function renderAlbum() {
+  $('#albumInfo').textContent = S.stickers.length
+    ? 'Máš ' + S.stickers.length + ' z ' + STICKERS.length + '. Za každých 5 hvězd dostaneš další.'
+    : 'Zatím tu nic není. Za každých 5 hvězd dostaneš novou nálepku.';
+  $('#album').innerHTML = STICKERS.map(x => S.stickers.includes(x)
+    ? '<div class="slot">' + x + '</div>' : '<div class="slot empty">?</div>').join('');
+  show('albumScreen');
+}
+
+function confetti() {
+  if (reduced) return;
+  const cols = ['#32A0D2', '#FFAA37', '#2FA86B', '#F46FA0', '#17415A'];
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('span');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = pick(cols);
+    c.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+    c.style.animationDelay = Math.random() * 0.4 + 's';
+    c.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4300);
+  }
+}
+
+/* ---------- ovládání ---------- */
+document.querySelectorAll('.level').forEach(b => b.onclick = () => startLevel(+b.dataset.max));
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => renderBoard(+t.dataset.max));
+$('#homeBtn').onclick = () => { tickStop(); show('start'); };
+$('#quitBtn').onclick = () => { tickStop(); show('start'); };
+$('#chooseBtn').onclick = () => show('start');
+$('#albumBack').onclick = () => show('start');
+$('#boardBack').onclick = () => show('start');
+$('#againBtn').onclick = () => startLevel(S.max);
+$('#stickerBtn').onclick = renderAlbum;
+$('#boardBtn').onclick = () => renderBoard(S.max);
+$('#boardFromEnd').onclick = () => renderBoard(S.max);
+$('#changeClass').onclick = askClass;
+$('#classOk').onclick = saveClass;
+$('#classInput').onkeydown = e => { if (e.key === 'Enter') $('#nickInput').focus(); };
+$('#nickInput').onkeydown = e => { if (e.key === 'Enter') saveClass(); };
+$('#clearBoard').onclick = () => {
+  if (confirm('Opravdu smazat všechny časy?')) { DB.records = {}; save(); renderHome(); renderBoard(S.boardMax); }
+};
+$('#stickerOk').onclick = () => {
+  $('#overlay').classList.remove('show');
+  if (S.pending) { S.pending = false; advance(); }
+};
+$('#soundBtn').onclick = () => {
+  soundOn = !soundOn;
+  $('#soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  $('#soundBtn').setAttribute('aria-label', soundOn ? 'Vypnout zvuk' : 'Zapnout zvuk');
+};
+
+load();
+updateCounters();
+renderHome();
+if (!S.cls) askClass();
+</script>
+</body>
+</html>
